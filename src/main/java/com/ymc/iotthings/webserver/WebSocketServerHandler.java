@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -36,7 +35,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
     private static final Logger LOG = LoggerFactory.getLogger(WebSocketServerHandler.class);
     LinkedList<Channel> clients = new LinkedList<>();
 
-    HashMap<Integer,LinkedList<Channel>> clientLists = new HashMap<>();
+    private static LinkedList<ChannelBean> beanList = new LinkedList<>();
 
     private WebSocketServerHandshaker handshaker;
     private MQSender mqSender;
@@ -85,7 +84,11 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
         clients.remove(ctx.channel());
+        beanList.removeIf(channelBean -> channelBean.getChannel().id().equals(ctx.channel().id()));
+        LOG.error("-- remove --" + beanList.toString());
     }
+
+    private ChannelBean channelBean;
 
     private void handleHttpRequest(ChannelHandlerContext ctx, FullHttpRequest req)
             throws Exception {
@@ -97,29 +100,17 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
         LOG.error(clients.toString());
         // 判断是否有权限，即 请求url 中有没有传递指定的参数
         Map<String, String> parmMap = new RequestParser(req).parse();
-        if (parmMap.get("id").equals("10")){
-            if(clientLists.size() == 0){
-                LinkedList<Channel> clientListBean = new LinkedList<>();
-                clientListBean.add(clients.getLast());
-                clientLists.put(Integer.valueOf(parmMap.get("id")),clientListBean);
-            }else{
-                // 如果有数据判断后 加入
-                for (Map.Entry<Integer, LinkedList<Channel>> entry : clientLists.entrySet()) {
-                    if(entry.getKey().equals(parmMap.get("id"))){
-                        for(Channel channelBean : entry.getValue()){
-                            if(!channelBean.id().equals(String.valueOf(ctx.channel().id()))){
-                                entry.getValue().add(clients.getLast());
-                            }
-                        }
-                    }
-                }
+        if (parmMap.get("id").equals("10") || parmMap.get("id").equals("1")) {
+            channelBean = new ChannelBean();
+            channelBean.setLineId(Integer.valueOf(parmMap.get("id")));
+            channelBean.setChannel(clients.getLast());
+            if (beanList.size() == 0 || !beanList.contains(channelBean)) {
+                beanList.add(channelBean);
             }
-        }else if(parmMap.get("id").equals("1")){
-
-        }else{
+        } else {
             sendHttpResponse(ctx, req, new DefaultFullHttpResponse(req.protocolVersion(), HttpResponseStatus.UNAUTHORIZED));
         }
-
+        LOG.error(beanList.toString());
         // 构造握手响应返回，本机测试
         WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory
                 (Init.WEB_SOCKET_URL, null, false);
@@ -135,6 +126,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
 
     /**
      * 如果状态不对 返回 http 应答
+     *
      * @param ctx ChannelHandlerContext
      * @param req FullHttpRequest
      * @param res FullHttpResponse
@@ -178,14 +170,12 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
                 format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), request);
         mqSender.send(request);
 
-        if(request.contains("A")){
-            // 发送到 客户端
-            ctx.writeAndFlush(new TextWebSocketFrame("发送到 客户端A: "+ msg));
-        }else{
-            // 发送到 客户端
-            ctx.writeAndFlush(new TextWebSocketFrame("发送到 客户端B: "+ msg));
+        for (ChannelBean bean : beanList) {
+            Channel chan = bean.getChannel();
+            if (chan.isActive() && chan.id().equals(ctx.channel().id())) {
+                ctx.writeAndFlush(new TextWebSocketFrame("发送到 客户端 -" + bean.getLineId() + "- :" + msg));
+            }
         }
-
 
     }
 
