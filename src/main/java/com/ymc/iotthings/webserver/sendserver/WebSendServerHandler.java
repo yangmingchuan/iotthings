@@ -1,6 +1,6 @@
 package com.ymc.iotthings.webserver.sendserver;
 
-import com.ymc.iotthings.webserver.MQSender;
+import com.ymc.iotthings.webserver.rabbitmq.MQSender;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpRequest;

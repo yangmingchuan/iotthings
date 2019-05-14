@@ -1,4 +1,4 @@
-package com.ymc.iotthings.webserver;
+package com.ymc.iotthings.webserver.beanutils;
 
 /**
  * package name: com.vip.things.netty.util

@@ -1,5 +1,10 @@
 package com.ymc.iotthings.webserver;
 
+import com.ymc.iotthings.webserver.beanutils.ChannelBean;
+import com.ymc.iotthings.webserver.beanutils.Init;
+import com.ymc.iotthings.webserver.beanutils.RequestParser;
+import com.ymc.iotthings.webserver.rabbitmq.MQSender;
+import com.ymc.iotthings.webserver.rabbitmq.customize.RabbitSendUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
@@ -8,6 +13,8 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.websocketx.*;
+import io.netty.handler.timeout.IdleState;
+import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.CharsetUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,8 +22,8 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.LinkedList;
 import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST;
 import static io.netty.handler.codec.http.HttpUtil.isKeepAlive;
@@ -25,6 +32,7 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 /**
  * web socket 自定义 handler
+ *
  * package name: com.vip.things.netty.webserver
  * date :2019/3/28
  * author : ymc
@@ -33,20 +41,22 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 @Component
 public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> {
     private static final Logger LOG = LoggerFactory.getLogger(WebSocketServerHandler.class);
-    LinkedList<Channel> clients = new LinkedList<>();
-
-    private static LinkedList<ChannelBean> beanList = new LinkedList<>();
+    /**
+     * 线程安全 linkedList
+     */
+    private static ConcurrentLinkedQueue<ChannelBean> beanList = new ConcurrentLinkedQueue<>();
 
     private WebSocketServerHandshaker handshaker;
     private MQSender mqSender;
-
-    public static final byte PING_MSG = 1;
-    public static final byte PONG_MSG = 2;
-    public static final byte CUSTOM_MSG = 3;
+    private RabbitSendUtil rabbitSendUtil;
     protected String name;
-    private int heartbeatCount = 0;
+    /**
+     * 心跳断开次数
+     */
+    private int heartCounter = 0;
 
-    public WebSocketServerHandler(MQSender mqSender) {
+    public WebSocketServerHandler(RabbitSendUtil rabbitSendUtil, MQSender mqSender) {
+        this.rabbitSendUtil = rabbitSendUtil;
         this.mqSender = mqSender;
     }
 
@@ -62,8 +72,40 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
         ctx.close();
     }
 
+    /**
+     * 用户状态监听
+     * @param ctx ChannelHandlerContext
+     * @param evt Object
+     * @throws Exception
+     */
+    @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        if (evt instanceof IdleStateEvent) {
+            IdleStateEvent event = (IdleStateEvent) evt;
+            if (event.state().equals(IdleState.READER_IDLE)){
+                // 空闲10s之后触发 (心跳包丢失)
+                if (heartCounter >= 3) {
+                    // 连续丢失3个心跳包 (断开连接)
+                    ctx.channel().close().sync();
+                    LOG.error("已与"+ctx.channel().remoteAddress()+"断开连接");
+                } else {
+                    heartCounter++;
+                    LOG.debug(ctx.channel().remoteAddress() + "丢失了第 " + heartCounter + " 个心跳包");
+                }
+            }
+
+        }
+    }
+
+    /**
+     * 通道信息的读取
+     * @param ctx ChannelHandlerContext
+     * @param msg msg
+     * @throws Exception
+     */
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
+        heartCounter = 0;
         // 传统的HTTP接入
         if (msg instanceof FullHttpRequest) {
             handleHttpRequest(ctx, (FullHttpRequest) msg);
@@ -77,13 +119,15 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         super.channelActive(ctx);
-        clients.add(ctx.channel());
     }
 
+    /**
+     * 设备断开
+     * @param ctx ChannelHandlerContext
+     */
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
-        clients.remove(ctx.channel());
         beanList.removeIf(channelBean -> channelBean.getChannel().id().equals(ctx.channel().id()));
         LOG.error("-- remove --" + beanList.toString());
     }
@@ -97,13 +141,12 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
             sendHttpResponse(ctx, req, new DefaultFullHttpResponse(HTTP_1_1, BAD_REQUEST));
             return;
         }
-        LOG.error(clients.toString());
         // 判断是否有权限，即 请求url 中有没有传递指定的参数
         Map<String, String> parmMap = new RequestParser(req).parse();
         if (parmMap.get("id").equals("10") || parmMap.get("id").equals("1")) {
             channelBean = new ChannelBean();
             channelBean.setLineId(Integer.valueOf(parmMap.get("id")));
-            channelBean.setChannel(clients.getLast());
+            channelBean.setChannel(ctx.channel());
             if (beanList.size() == 0 || !beanList.contains(channelBean)) {
                 beanList.add(channelBean);
             }
@@ -168,12 +211,12 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
         LOG.info(String.format("%s socketServer 接收到的消息 %s", ctx.channel(), request));
         String msg = String.format("%s  %s", LocalDateTime.now().
                 format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), request);
-        mqSender.send(request);
 
         for (ChannelBean bean : beanList) {
             Channel chan = bean.getChannel();
             if (chan.isActive() && chan.id().equals(ctx.channel().id())) {
                 ctx.writeAndFlush(new TextWebSocketFrame("发送到 客户端 -" + bean.getLineId() + "- :" + msg));
+                rabbitSendUtil.sendToQueue("hello."+bean.getLineId(),msg);
             }
         }
 

@@ -1,4 +1,4 @@
-package com.ymc.iotthings.webserver;
+package com.ymc.iotthings.webserver.beanutils;
 
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpMethod;

@@ -1,11 +1,8 @@
-package com.ymc.iotthings.webserver;
+package com.ymc.iotthings.webserver.rabbitmq;
 
-import com.ymc.iotthings.webserver.sendserver.WebSendServer;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
 
 /**
  * package name: com.vip.things.rabbit
@@ -14,21 +11,12 @@ import javax.annotation.Resource;
  **/
 
 @Component
-@RabbitListener(queues = "Hello2")
 public class Receiver2 {
 
-    @Resource
-    WebSendServer webSendServer;
-
-    private boolean hasFisrt;
-
     @RabbitHandler
+    @RabbitListener(queues = "hello",containerFactory="rabbitListenerContainerFactory")
     public void receiver(String msg) throws Exception {
         System.out.println("mq hello2 receiver2:"+msg);
-        if(!hasFisrt){
-            hasFisrt = true;
-            webSendServer.run(Init.SEND_PORT);
-        }
     }
 
 }

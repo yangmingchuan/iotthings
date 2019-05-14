@@ -1,4 +1,4 @@
-package com.ymc.iotthings.webserver;
+package com.ymc.iotthings.webserver.rabbitmq;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
