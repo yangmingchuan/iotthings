@@ -12,8 +12,8 @@ import org.springframework.stereotype.Component;
 public class RabbitReceive {
 
     @RabbitHandler
-    @RabbitListener(queues = "QueueName")
+    @RabbitListener(queues = "#{autoDeleteQueue.name}")
     public void processMessage(String content){
-        System.err.println(content);
+        System.out.println("receiver :" + content);
     }
 }

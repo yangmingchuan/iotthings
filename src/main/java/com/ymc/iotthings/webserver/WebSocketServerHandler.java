@@ -4,7 +4,6 @@ import com.ymc.iotthings.webserver.beanutils.ChannelBean;
 import com.ymc.iotthings.webserver.beanutils.Init;
 import com.ymc.iotthings.webserver.beanutils.RequestParser;
 import com.ymc.iotthings.webserver.rabbitmq.MQSender;
-import com.ymc.iotthings.webserver.rabbitmq.customize.RabbitSendUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
@@ -48,15 +47,13 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
 
     private WebSocketServerHandshaker handshaker;
     private MQSender mqSender;
-    private RabbitSendUtil rabbitSendUtil;
     protected String name;
     /**
      * 心跳断开次数
      */
     private int heartCounter = 0;
 
-    public WebSocketServerHandler(RabbitSendUtil rabbitSendUtil, MQSender mqSender) {
-        this.rabbitSendUtil = rabbitSendUtil;
+    public WebSocketServerHandler(MQSender mqSender) {
         this.mqSender = mqSender;
     }
 
@@ -216,7 +213,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
             Channel chan = bean.getChannel();
             if (chan.isActive() && chan.id().equals(ctx.channel().id())) {
                 ctx.writeAndFlush(new TextWebSocketFrame("发送到 客户端 -" + bean.getLineId() + "- :" + msg));
-                rabbitSendUtil.sendToQueue("hello."+bean.getLineId(),msg);
+                mqSender.send("Queue"+bean.getLineId(),msg);
             }
         }
 

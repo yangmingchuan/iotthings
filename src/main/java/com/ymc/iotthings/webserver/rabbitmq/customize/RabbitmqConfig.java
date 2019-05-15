@@ -1,7 +1,6 @@
 package com.ymc.iotthings.webserver.rabbitmq.customize;
 
 import org.springframework.amqp.core.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
@@ -16,43 +15,37 @@ import org.springframework.stereotype.Component;
 @Component
 public class RabbitmqConfig {
 
-    private AmqpAdmin amqpAdmin;
-    private String queueName = "hello.#";
-
-    @Autowired
-    public void setAmqpAdmin(AmqpAdmin amqpAdmin) {
-        this.amqpAdmin = amqpAdmin;
+    /**
+     * 创建人：张博
+     * 时间：2018/3/5 上午10:45
+     * @apiNote 定义扇出（广播）交换器
+     */
+    @Bean
+    public FanoutExchange fanoutExchange() {
+        return new FanoutExchange("fanout-exchange");
     }
 
     /**
-     *  项目启动即能创建的Exchange
-     *  可以创建各种类型的Exchange，父类都是 AbstractExchange
-     *  这里举例Topic类型
-     *  如果需要创建多个同类型可以用@Bean(name="beanName")，引用时用@Qualifier("beanName" )
+     * 创建人：张博
+     * 时间：2018/3/5 上午10:48
+     * @apiNote 定义自动删除匿名队列
      */
     @Bean
-    public TopicExchange exchange(){
-        String exchangeName = "exchange";
-        TopicExchange dataExchange = new TopicExchange(exchangeName,true,false);
-        amqpAdmin.declareExchange(dataExchange);
-        return dataExchange;
+    public Queue autoDeleteQueue() {
+        return new AnonymousQueue();
     }
 
     /**
-     * 项目创建就生成的Queue
-     * @return
+     * 创建人：张博
+     * 时间：2018/3/5 上午10:48
+     * @param fanoutExchange 扇出（广播）交换器
+     * @param autoDeleteQueue0 自动删除队列
+     * @apiNote 把队列绑定到扇出（广播）交换器
+     * @return Binding
      */
     @Bean
-    public Queue queue(){
-        Queue queue = new Queue(queueName,true,false,false);
-        amqpAdmin.declareQueue(queue);
-        return queue;
+    public Binding binding(FanoutExchange fanoutExchange, Queue autoDeleteQueue0) {
+        return BindingBuilder.bind(autoDeleteQueue0).to(fanoutExchange);
     }
-
-    @Bean
-    Binding bindingExchangeMessage(Queue queueMessage, TopicExchange exchange) {
-        return BindingBuilder.bind(queueMessage).to(exchange).with(queueName);
-    }
-
 
 }

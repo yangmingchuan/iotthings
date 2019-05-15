@@ -100,7 +100,7 @@ public class WebSendServerHandler extends SimpleChannelInboundHandler<Object> {
         String request = ((TextWebSocketFrame) frame).text();
         LOG.info(String.format("%s sendServer 接收到的消息 %s", ctx.channel(), request));
         String msg = String.format("%s  %s", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), request);
-        mqSender.send(request);
+        mqSender.send("hello00",request);
         // 发送到 客户端
         ctx.writeAndFlush(new TextWebSocketFrame("dervice 接收消息"));
         ctx.writeAndFlush(new TextWebSocketFrame("发送到 客户端: "+ msg));

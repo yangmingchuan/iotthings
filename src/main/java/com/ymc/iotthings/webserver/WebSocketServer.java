@@ -1,7 +1,6 @@
 package com.ymc.iotthings.webserver;
 
 import com.ymc.iotthings.webserver.rabbitmq.MQSender;
-import com.ymc.iotthings.webserver.rabbitmq.customize.RabbitSendUtil;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -46,9 +45,6 @@ public class WebSocketServer {
     @Resource
     MQSender mqSender;
 
-    @Resource
-    RabbitSendUtil rabbitSendUtil;
-
     public void run(int port) throws Exception {
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
@@ -68,7 +64,7 @@ public class WebSocketServer {
                             pipeline.addLast("http-codec", new HttpServerCodec()); // Http消息编码解码
                             pipeline.addLast("aggregator", new HttpObjectAggregator(65536)); // Http消息组装
                             pipeline.addLast("http-chunked", new ChunkedWriteHandler()); // WebSocket通信支持
-                            pipeline.addLast("handler", new WebSocketServerHandler(rabbitSendUtil,mqSender)); // WebSocket服务端Handler
+                            pipeline.addLast("handler", new WebSocketServerHandler(mqSender)); // WebSocket服务端Handler
                             //服务端心跳检测
                             pipeline.addLast(new IdleStateHandler(SERVER_READ_IDEL_TIME_OUT,
                                     SERVER_WRITE_IDEL_TIME_OUT,SERVER_ALL_IDEL_TIME_OUT, TimeUnit.SECONDS));
