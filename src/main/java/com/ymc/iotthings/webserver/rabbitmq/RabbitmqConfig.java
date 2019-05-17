@@ -1,4 +1,4 @@
-package com.ymc.iotthings.webserver.rabbitmq.customize;
+package com.ymc.iotthings.webserver.rabbitmq;
 
 import org.springframework.amqp.core.*;
 import org.springframework.context.annotation.Bean;
@@ -16,8 +16,6 @@ import org.springframework.stereotype.Component;
 public class RabbitmqConfig {
 
     /**
-     * 创建人：张博
-     * 时间：2018/3/5 上午10:45
      * @apiNote 定义扇出（广播）交换器
      */
     @Bean
@@ -26,8 +24,15 @@ public class RabbitmqConfig {
     }
 
     /**
-     * 创建人：张博
-     * 时间：2018/3/5 上午10:48
+     * @apiNote 定义扇出（广播）交换器
+     */
+    @Bean
+    public FanoutExchange fanoutWebExchange() {
+        return new FanoutExchange("fanout-web-exchange");
+    }
+
+
+    /**
      * @apiNote 定义自动删除匿名队列
      */
     @Bean
@@ -35,17 +40,27 @@ public class RabbitmqConfig {
         return new AnonymousQueue();
     }
 
+    @Bean
+    public Queue autoWebDeleteQueue() {
+        return new AnonymousQueue();
+    }
+
     /**
      * 创建人：张博
      * 时间：2018/3/5 上午10:48
      * @param fanoutExchange 扇出（广播）交换器
-     * @param autoDeleteQueue0 自动删除队列
+     * @param autoDeleteQueue 自动删除队列
      * @apiNote 把队列绑定到扇出（广播）交换器
      * @return Binding
      */
     @Bean
-    public Binding binding(FanoutExchange fanoutExchange, Queue autoDeleteQueue0) {
-        return BindingBuilder.bind(autoDeleteQueue0).to(fanoutExchange);
+    public Binding binding(FanoutExchange fanoutExchange, Queue autoDeleteQueue) {
+        return BindingBuilder.bind(autoDeleteQueue).to(fanoutExchange);
+    }
+
+    @Bean
+    public Binding webBinding(FanoutExchange fanoutWebExchange, Queue autoWebDeleteQueue) {
+        return BindingBuilder.bind(autoWebDeleteQueue).to(fanoutWebExchange);
     }
 
 }

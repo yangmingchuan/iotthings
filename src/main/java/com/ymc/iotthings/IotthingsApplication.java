@@ -1,7 +1,7 @@
 package com.ymc.iotthings;
 
-import com.ymc.iotthings.webserver.beanutils.Init;
 import com.ymc.iotthings.webserver.WebSocketServer;
+import com.ymc.iotthings.webserver.beanutils.Init;
 import com.ymc.iotthings.webserver.sendserver.WebSendServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -10,6 +10,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 import javax.annotation.Resource;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @SpringBootApplication
 @ComponentScan("com.ymc")
@@ -19,13 +21,30 @@ public class IotthingsApplication implements CommandLineRunner {
 	WebSocketServer webSocketServer;
 	@Resource
 	WebSendServer webSendServer;
+	/**
+	 * 定长 线程池
+	 */
+	ExecutorService fixedThreadPool = Executors.newFixedThreadPool(2);
+
 	public static void main(String[] args) {
 		SpringApplication.run(IotthingsApplication.class, args);
 	}
 
 	@Override
 	public void run(String... args) throws Exception {
-		webSocketServer.run(Init.PORT);
-		webSendServer.run(Init.SEND_PORT);
+		fixedThreadPool.execute(() -> {
+            try {
+                webSendServer.run(Init.SEND_PORT);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+		fixedThreadPool.execute(() -> {
+			try {
+				webSocketServer.run(Init.PORT);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		});
 	}
 }

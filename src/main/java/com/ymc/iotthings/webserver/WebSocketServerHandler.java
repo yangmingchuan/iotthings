@@ -17,6 +17,8 @@ import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.CharsetUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.annotation.RabbitHandler;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -125,7 +127,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
-        beanList.removeIf(channelBean -> channelBean.getChannel().id().equals(ctx.channel().id()));
+        beanList.removeIf(channelBean -> channelBean.getChannelId().equals(ctx.channel().id()));
         LOG.error("-- remove --" + beanList.toString());
     }
 
@@ -140,10 +142,11 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
         }
         // 判断是否有权限，即 请求url 中有没有传递指定的参数
         Map<String, String> parmMap = new RequestParser(req).parse();
-        if (parmMap.get("id").equals("10") || parmMap.get("id").equals("1")) {
+        if (parmMap.get("id").equals("10") || parmMap.get("id").equals("1") || parmMap.get("id").equals("2")) {
             channelBean = new ChannelBean();
             channelBean.setLineId(Integer.valueOf(parmMap.get("id")));
-            channelBean.setChannel(ctx.channel());
+            channelBean.setChannelId(ctx.channel().id());
+            channelBean.setActive(ctx.channel().isActive());
             if (beanList.size() == 0 || !beanList.contains(channelBean)) {
                 beanList.add(channelBean);
             }
@@ -210,13 +213,18 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
                 format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), request);
 
         for (ChannelBean bean : beanList) {
-            Channel chan = bean.getChannel();
-            if (chan.isActive() && chan.id().equals(ctx.channel().id())) {
+            if (bean.isActive() && bean.getChannelId().equals(ctx.channel().id())) {
                 ctx.writeAndFlush(new TextWebSocketFrame("发送到 客户端 -" + bean.getLineId() + "- :" + msg));
-                mqSender.send("Queue"+bean.getLineId(),msg);
+                mqSender.send("Queue."+bean.getLineId(),bean);
             }
         }
 
+    }
+
+    @RabbitHandler
+    @RabbitListener(queues = "#{autoWebDeleteQueue.name}")
+    public void processMessage(String content){
+        System.out.println("receiver web bean :" + content);
     }
 
 }

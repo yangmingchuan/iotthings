@@ -1,5 +1,6 @@
 package com.ymc.iotthings.webserver;
 
+import com.ymc.iotthings.webserver.beanutils.Init;
 import com.ymc.iotthings.webserver.rabbitmq.MQSender;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
@@ -26,6 +27,8 @@ import java.util.concurrent.TimeUnit;
 
 
 /**
+ * netty client server 端
+ *
  * package name: com.vip.things.netty.webserver
  * date :2019/3/28
  * author : ymc
@@ -37,10 +40,6 @@ public class WebSocketServer {
      * NettyServerListener 日志输出器
      */
     private static final Logger LOG = LoggerFactory.getLogger(WebSocketServer.class);
-
-    private static final int SERVER_READ_IDEL_TIME_OUT = 10;
-    private static final int SERVER_WRITE_IDEL_TIME_OUT = 0;
-    private static final int SERVER_ALL_IDEL_TIME_OUT = 0;
 
     @Resource
     MQSender mqSender;
@@ -66,8 +65,8 @@ public class WebSocketServer {
                             pipeline.addLast("http-chunked", new ChunkedWriteHandler()); // WebSocket通信支持
                             pipeline.addLast("handler", new WebSocketServerHandler(mqSender)); // WebSocket服务端Handler
                             //服务端心跳检测
-                            pipeline.addLast(new IdleStateHandler(SERVER_READ_IDEL_TIME_OUT,
-                                    SERVER_WRITE_IDEL_TIME_OUT,SERVER_ALL_IDEL_TIME_OUT, TimeUnit.SECONDS));
+                            pipeline.addLast(new IdleStateHandler(Init.SERVER_READ_IDEL_TIME_OUT,
+                                    Init.SERVER_WRITE_IDEL_TIME_OUT,Init.SERVER_ALL_IDEL_TIME_OUT, TimeUnit.SECONDS));
                             //粘包拆包处理
                             ByteBuf delimiter = Unpooled.copiedBuffer("&&&".getBytes());
                             /*
@@ -81,7 +80,7 @@ public class WebSocketServer {
                         }
                     });
             Channel channel = bootstrap.bind(port).sync().channel();
-            LOG.info("WebSocket 已经启动，端口：" + port + ".");
+            LOG.info("clientSocket 已经启动，端口：" + port + ".");
             channel.closeFuture().sync();
         } finally {
             // 释放线程池资源

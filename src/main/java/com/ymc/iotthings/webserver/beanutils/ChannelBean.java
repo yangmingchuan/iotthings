@@ -1,6 +1,8 @@
 package com.ymc.iotthings.webserver.beanutils;
 
-import io.netty.channel.Channel;
+import io.netty.channel.ChannelId;
+
+import java.io.Serializable;
 
 /**
  * package name: com.ymc.iotthings.webserver
@@ -8,18 +10,36 @@ import io.netty.channel.Channel;
  * author : ymc
  **/
 
-public class ChannelBean {
+public class ChannelBean implements Serializable{
 
-    private Channel channel;
-
+    /**
+     * 分组id
+     */
     private int lineId;
+    /**
+     * 设备id
+     */
+    private ChannelId channelId;
 
-    public Channel getChannel() {
-        return channel;
+    /**
+     * 连接标识
+     */
+    private boolean isActive;
+
+    public boolean isActive() {
+        return isActive;
     }
 
-    public void setChannel(Channel channel) {
-        this.channel = channel;
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
+    public ChannelId getChannelId() {
+        return channelId;
+    }
+
+    public void setChannelId(ChannelId channelId) {
+        this.channelId = channelId;
     }
 
     public int getLineId() {
