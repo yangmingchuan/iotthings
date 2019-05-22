@@ -46,8 +46,6 @@ public class RabbitmqConfig {
     }
 
     /**
-     * 创建人：张博
-     * 时间：2018/3/5 上午10:48
      * @param fanoutExchange 扇出（广播）交换器
      * @param autoDeleteQueue 自动删除队列
      * @apiNote 把队列绑定到扇出（广播）交换器
