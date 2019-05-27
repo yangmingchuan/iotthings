@@ -23,6 +23,7 @@ public class MQSender {
     private final RabbitTemplate rabbitTemplate;
     private final FanoutExchange fanoutExchange;
     private final RabbitmqConfig rabbitmqConfig;
+
     @Autowired
     public MQSender(AmqpAdmin amqpAdmin, RabbitTemplate rabbitTemplate, FanoutExchange fanoutExchange,RabbitmqConfig rabbitmqConfig) {
         LOGGER.info("MQSender 初始化中...");
@@ -31,29 +32,27 @@ public class MQSender {
         this.fanoutExchange = fanoutExchange;
         this.rabbitmqConfig = rabbitmqConfig;
     }
+
     /**
      * 给queue发送消息
-     * @param queueName queueName
+     * @param exchangeName queueName
      * @param msg msg
      */
-    public <T> void send(String queueName,T msg){
-        // 动态创建
-        amqpAdmin.declareExchange(new FanoutExchange("amqpadmin.exchange"));
-        amqpAdmin.declareQueue(new Queue("amqpadmin.queue",true));
-//        Queue queue = rabbitmqConfig.autoDeleteQueue();
-//        amqpAdmin.declareQueue(queue);
-        amqpAdmin.declareBinding(new Binding("amqpadmin.queue",
-                Binding.DestinationType.QUEUE,"amqpadmin.exchange","amqp.haha",null));
-//        Binding binding = BindingBuilder.bind(queue).to(fanoutExchange);
-//        amqpAdmin.declareBinding(binding);
+    public <T> void send(String exchangeName,T msg){
+        FanoutExchange exchange = new FanoutExchange(exchangeName);
+        amqpAdmin.declareExchange(exchange);
+        Queue queue = rabbitmqConfig.autoDeleteQueue();
+        amqpAdmin.declareQueue(queue);
+        Binding binding = BindingBuilder.bind(queue).to(fanoutExchange);
+        amqpAdmin.declareBinding(binding);
         if(msg instanceof String){
             MessageProperties messageProperties = new MessageProperties();
             //设置消息内容的类型，默认是 application/octet-stream 会是 ASCII 码值
             messageProperties.setContentType(MessageProperties.CONTENT_TYPE_TEXT_PLAIN);
             Message message = new Message(((String) msg).getBytes(),messageProperties);
-            rabbitTemplate.convertAndSend("amqpadmin.exchange","amqpadmin.queue",message);
+            rabbitTemplate.convertAndSend(fanoutExchange.getName(),queue.getName(),message);
         }else if(msg instanceof ChannelBean){
-            rabbitTemplate.convertAndSend("amqpadmin.exchange","amqpadmin.queue", msg);
+            rabbitTemplate.convertAndSend(fanoutExchange.getName(),queue.getName(), msg);
         }
     }
 

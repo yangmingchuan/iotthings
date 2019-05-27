@@ -1,6 +1,8 @@
 package com.ymc.iotthings.controller;
 
 import com.ymc.iotthings.model.UserInfo;
+import com.ymc.iotthings.ret.RetResponse;
+import com.ymc.iotthings.ret.RetResult;
 import com.ymc.iotthings.service.UserInfoService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,8 +30,9 @@ public class UserInfoController {
     }
 
     @PostMapping("/selectById")
-    public UserInfo selectById(Integer id){
-        return userInfoService.selectById(id);
+    public RetResult<UserInfo> selectById(Integer id){
+        UserInfo userInfo = userInfoService.selectById(id);
+        return RetResponse.makeOKRsp(userInfo);
     }
 
 }

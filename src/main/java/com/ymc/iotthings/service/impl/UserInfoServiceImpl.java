@@ -1,5 +1,6 @@
 package com.ymc.iotthings.service.impl;
 
+import com.ymc.iotthings.configurer.ServiceException;
 import com.ymc.iotthings.dao.UserInfoMapper;
 import com.ymc.iotthings.model.UserInfo;
 import com.ymc.iotthings.service.UserInfoService;
@@ -20,7 +21,12 @@ public class UserInfoServiceImpl implements UserInfoService {
     private UserInfoMapper userInfoMapper;
 
     public UserInfo selectById(Integer id){
-        return userInfoMapper.selectById(id);
+        UserInfo userInfo = userInfoMapper.selectById(id);
+        if(userInfo == null){
+            throw new ServiceException("暂无该用户");
+        }
+        return userInfo;
+
     }
 
 }

@@ -215,7 +215,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
         for (ChannelBean bean : beanList) {
             if (bean.isActive() && bean.getChannelId().equals(ctx.channel().id())) {
                 ctx.writeAndFlush(new TextWebSocketFrame("发送到 客户端 -" + bean.getLineId() + "- :" + msg));
-                mqSender.send("Queue."+bean.getLineId(),bean);
+                mqSender.send("exchange."+bean.getLineId(),bean);
             }
         }
 

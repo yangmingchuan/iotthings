@@ -168,15 +168,15 @@ public class WebSendServerHandler extends SimpleChannelInboundHandler<Object> {
             handleWebSocketFrame(ctx, (WebSocketFrame) msg);
         }
     }
-    //#{autoDeleteQueue.name}
+
 //    @RabbitHandler
-    @RabbitListener(queues = "amqpadmin.queue")
+    @RabbitListener(queues = "#{autoDeleteQueue.name}")
     public void processMessage(ChannelBean content){
         /**
          * client server 通知 web server
          */
         System.out.println("web netty 接收到消息 :" + content.getLineId());
         msg = String.format("%s  %s", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), "web send");
-        mqSender.webSend("web.1",msg);
+        mqSender.webSend("exchange.100",msg);
     }
 }
