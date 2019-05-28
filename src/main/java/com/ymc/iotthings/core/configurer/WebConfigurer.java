@@ -1,11 +1,11 @@
-package com.ymc.iotthings.configurer;
+package com.ymc.iotthings.core.configurer;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter4;
-import com.ymc.iotthings.ret.RetCode;
-import com.ymc.iotthings.ret.RetResult;
+import com.ymc.iotthings.core.ret.RetCode;
+import com.ymc.iotthings.core.ret.RetResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +15,7 @@ import org.springframework.messaging.handler.HandlerMethod;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,7 +28,7 @@ import java.util.List;
 /**
  * 消息转换器
  *
- * package name: com.ymc.iotthings.configurer
+ * package name: com.ymc.iotthings.core.configurer
  * date :2019/5/27
  * author : ymc
  **/
@@ -125,7 +126,16 @@ public class WebConfigurer extends WebMvcConfigurationSupport {
         }
     }
 
-
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("swagger-ui.html")
+                .addResourceLocations("classpath:/META-INF/resources/");
+        registry.addResourceHandler("/webjars/**")
+                .addResourceLocations("classpath:/META-INF/resources/webjars/");
+        registry.addResourceHandler("/favicon.ico")
+                .addResourceLocations("classpath:/META-INF/resources/favicon.ico");
+        super.addResourceHandlers(registry);
+    }
 
     private List<MediaType> getSupportedMediaTypes() {
         List<MediaType> supportedMediaTypes = new ArrayList<>();

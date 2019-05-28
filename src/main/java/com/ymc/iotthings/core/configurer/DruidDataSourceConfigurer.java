@@ -1,4 +1,4 @@
-package com.ymc.iotthings.configurer;
+package com.ymc.iotthings.core.configurer;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import org.slf4j.Logger;
@@ -13,7 +13,7 @@ import java.sql.SQLException;
 /**
  * druid 连接池配置文件
  *
- * package name: com.ymc.iotthings.configurer
+ * package name: com.ymc.iotthings.core.configurer
  * date :2019/5/27
  * author : ymc
  **/

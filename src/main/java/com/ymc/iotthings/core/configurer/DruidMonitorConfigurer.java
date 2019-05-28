@@ -1,4 +1,4 @@
-package com.ymc.iotthings.configurer;
+package com.ymc.iotthings.core.configurer;
 
 import com.alibaba.druid.support.http.StatViewServlet;
 import com.alibaba.druid.support.http.WebStatFilter;
@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * Druid监控配置
- * package name: com.ymc.iotthings.configurer
+ * package name: com.ymc.iotthings.core.configurer
  * date :2019/5/27
  * author : ymc
  **/

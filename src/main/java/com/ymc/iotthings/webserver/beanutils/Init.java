@@ -3,7 +3,7 @@ package com.ymc.iotthings.webserver.beanutils;
 /**
  * 常量
  *
- * package name: com.vip.things.netty.util
+ * package name: com.vip.things.netty.utils
  * date :2019/3/27
  * author : ymc
  **/

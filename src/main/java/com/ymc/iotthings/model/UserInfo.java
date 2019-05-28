@@ -1,6 +1,5 @@
 package com.ymc.iotthings.model;
 
-
 import javax.persistence.Column;
 import javax.persistence.Id;
 
@@ -15,18 +14,16 @@ import javax.persistence.Id;
 public class UserInfo {
 
     /**
-     * primary key
+     * 主键
      */
     @Id
     private String id;
 
     /**
-     * username
+     * 用户名
      */
     @Column(name = "user_name")
     private String userName;
-
-    private String password;
 
     public String getId() {
         return id;
@@ -44,11 +41,4 @@ public class UserInfo {
         this.userName = userName;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 }

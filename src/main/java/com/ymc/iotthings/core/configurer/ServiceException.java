@@ -1,11 +1,11 @@
-package com.ymc.iotthings.configurer;
+package com.ymc.iotthings.core.configurer;
 
 import java.io.Serializable;
 
 /**
  * 统一异常处理类
  *
- * package name: com.ymc.iotthings.configurer
+ * package name: com.ymc.iotthings.core.configurer
  * date :2019/5/27
  * author : ymc
  **/

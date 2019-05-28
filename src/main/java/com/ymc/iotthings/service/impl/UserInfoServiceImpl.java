@@ -1,9 +1,10 @@
 package com.ymc.iotthings.service.impl;
 
-import com.ymc.iotthings.configurer.ServiceException;
+import com.ymc.iotthings.core.configurer.ServiceException;
 import com.ymc.iotthings.dao.UserInfoMapper;
 import com.ymc.iotthings.model.UserInfo;
 import com.ymc.iotthings.service.UserInfoService;
+import com.ymc.iotthings.core.universal.AbstractService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -16,17 +17,18 @@ import javax.annotation.Resource;
  **/
 
 @Service
-public class UserInfoServiceImpl implements UserInfoService {
+public class UserInfoServiceImpl extends AbstractService<UserInfo> implements UserInfoService {
+
     @Resource
     private UserInfoMapper userInfoMapper;
 
-    public UserInfo selectById(Integer id){
-        UserInfo userInfo = userInfoMapper.selectById(id);
-        if(userInfo == null){
+    @Override
+    public UserInfo selectById(String id) {
+        UserInfo userInfo = userInfoMapper.selectByPrimaryKey(id);
+        if (userInfo == null) {
             throw new ServiceException("暂无该用户");
         }
         return userInfo;
-
     }
-
 }
+

@@ -1,9 +1,9 @@
-package com.ymc.iotthings.ret;
+package com.ymc.iotthings.core.ret;
 
 /**
  * 响应码枚举，参考HTTP状态码的语义
  *
- * package name: com.ymc.iotthings.ret
+ * package name: com.ymc.iotthings.core.ret
  * date :2019/5/27
  * author : ymc
  **/

@@ -1,9 +1,9 @@
-package com.ymc.iotthings.ret;
+package com.ymc.iotthings.core.ret;
 
 /**
  * 将结果转换为封装后的对象
  *
- * package name: com.ymc.iotthings.ret
+ * package name: com.ymc.iotthings.core.ret
  * date :2019/5/27
  * author : ymc
  **/
