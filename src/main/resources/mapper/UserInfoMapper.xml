@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ymc.iotthings.dao.UserInfoMapper">
-
-    <resultMap id="BaseResultMap" type="com.ymc.iotthings.model.UserInfo">
-        <id column="id" jdbcType="VARCHAR" property="id"/>
-        <result column="user_name" jdbcType="VARCHAR" property="userName"/>
-    </resultMap>
-
-    <sql id="Base_Column_List">
-        id,user_name
-    </sql>
-
+  <resultMap id="BaseResultMap" type="com.ymc.iotthings.model.UserInfo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <result column="id" jdbcType="VARCHAR" property="id" />
+    <result column="user_name" jdbcType="VARCHAR" property="userName" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="salt" jdbcType="VARCHAR" property="salt" />
+  </resultMap>
 
 </mapper>

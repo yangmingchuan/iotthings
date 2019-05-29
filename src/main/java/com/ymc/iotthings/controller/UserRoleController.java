@@ -3,8 +3,8 @@ package com.ymc.iotthings.controller;
 import com.ymc.iotthings.core.ret.RetResult;
 import com.ymc.iotthings.core.ret.RetResponse;
 import com.ymc.iotthings.core.utils.ApplicationUtils;
-import com.ymc.iotthings.model.SystemLog;
-import com.ymc.iotthings.service.SystemLogService;
+import com.ymc.iotthings.model.UserRole;
+import com.ymc.iotthings.service.UserRoleService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,54 +16,54 @@ import javax.annotation.Resource;
 import java.util.List;
 
 /**
-* @Description: SystemLogController类
+* @Description: UserRoleController类
 * @author ymc
-* @date 2019/05/29 10:16
+* @date 2019/05/29 10:28
 */
 @RestController
-@RequestMapping("/systemLog")
-public class SystemLogController {
+@RequestMapping("/userRole")
+public class UserRoleController {
 
     @Resource
-    private SystemLogService systemLogService;
+    private UserRoleService userRoleService;
 
     @PostMapping("/insert")
-    public RetResult<Integer> insert(SystemLog systemLog) throws Exception{
-        systemLog.setId(ApplicationUtils.getUUID());
-        Integer state = systemLogService.insert(systemLog);
+    public RetResult<Integer> insert(UserRole userRole) throws Exception{
+        userRole.setId(ApplicationUtils.getUUID());
+        Integer state = userRoleService.insert(userRole);
         return RetResponse.makeOKRsp(state);
     }
 
     @PostMapping("/deleteById")
     public RetResult<Integer> deleteById(@RequestParam String id) throws Exception {
-        Integer state = systemLogService.deleteById(id);
+        Integer state = userRoleService.deleteById(id);
         return RetResponse.makeOKRsp(state);
     }
 
     @PostMapping("/update")
-    public RetResult<Integer> update(SystemLog systemLog) throws Exception {
-         Integer state = systemLogService.update(systemLog);
+    public RetResult<Integer> update(UserRole userRole) throws Exception {
+         Integer state = userRoleService.update(userRole);
          return RetResponse.makeOKRsp(state);
     }
 
     @PostMapping("/selectById")
-    public RetResult<SystemLog> selectById(@RequestParam String id) throws Exception {
-        SystemLog systemLog = systemLogService.selectById(id);
-        return RetResponse.makeOKRsp(systemLog);
+    public RetResult<UserRole> selectById(@RequestParam String id) throws Exception {
+        UserRole userRole = userRoleService.selectById(id);
+        return RetResponse.makeOKRsp(userRole);
     }
 
      /**
      * @Description: 分页查询
      * @param page 页码
      * @param size 每页条数
-     * @Reutrn RetResult<PageInfo<SystemLog>>
+     * @Reutrn RetResult<PageInfo<UserRole>>
      */
      @PostMapping("/list")
-     public RetResult<PageInfo<SystemLog>> list(@RequestParam(defaultValue = "0") Integer page,
+     public RetResult<PageInfo<UserRole>> list(@RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "0") Integer size) throws Exception {
          PageHelper.startPage(page, size);
-         List<SystemLog> list = systemLogService.selectAll();
-         PageInfo<SystemLog> pageInfo = new PageInfo<SystemLog>(list);
+         List<UserRole> list = userRoleService.selectAll();
+         PageInfo<UserRole> pageInfo = new PageInfo<UserRole>(list);
          return RetResponse.makeOKRsp(pageInfo);
      }
 }

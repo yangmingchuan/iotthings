@@ -19,6 +19,12 @@ public enum  RetCode {
     // 未认证（签名错误）
     UNAUTHORIZED(401),
 
+    /** 未登录 */
+    UNAUTHEN(4401),
+
+    /** 未授权，拒绝访问 */
+    UNAUTHZ(4403),
+
     // 接口不存在
     NOT_FOUND(404),
 

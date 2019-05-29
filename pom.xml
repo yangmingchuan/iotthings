@@ -176,6 +176,20 @@
 			<version>1.4.5.RELEASE</version>
 		</dependency>
 
+		<!--  jsoup  爬虫及 xxs 过滤  -->
+		<dependency>
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+			<version>1.10.2</version>
+		</dependency>
+
+		<!--  身份认证  -->
+		<dependency>
+			<groupId>org.apache.shiro</groupId>
+			<artifactId>shiro-spring-boot-web-starter</artifactId>
+			<version>1.4.0-RC2</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>

@@ -1,16 +1,7 @@
 package com.ymc.iotthings.dao;
 
-import com.ymc.iotthings.model.UserInfo;
 import com.ymc.iotthings.core.universal.Mapper;
-
-/**
- * 继承 封装好的 mapper
- * 参考博客：https://juejin.im/post/5ad6b3c3f265da237c696ba0
- * package name: com.vip.things.dao
- * date :2019年3月25日 08:53:59
- * author : ymc
- **/
+import com.ymc.iotthings.model.UserInfo;
 
 public interface UserInfoMapper extends Mapper<UserInfo> {
-
 }

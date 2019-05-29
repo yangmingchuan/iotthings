@@ -3,6 +3,7 @@ package com.ymc.iotthings.controller;
 import com.ymc.iotthings.core.ret.RetResponse;
 import com.ymc.iotthings.core.ret.RetResult;
 import com.ymc.iotthings.service.RedisService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -24,6 +25,7 @@ import javax.annotation.Resource;
 
 @RestController
 @RequestMapping("/redis")
+@Api(tags = {"Redis操作接口"}, description = "RedisController")
 public class RedisController {
 
     @Resource

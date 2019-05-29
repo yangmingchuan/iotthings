@@ -3,8 +3,8 @@ package com.ymc.iotthings.controller;
 import com.ymc.iotthings.core.ret.RetResult;
 import com.ymc.iotthings.core.ret.RetResponse;
 import com.ymc.iotthings.core.utils.ApplicationUtils;
-import com.ymc.iotthings.model.SystemLog;
-import com.ymc.iotthings.service.SystemLogService;
+import com.ymc.iotthings.model.SysPerm;
+import com.ymc.iotthings.service.SysPermService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,54 +16,54 @@ import javax.annotation.Resource;
 import java.util.List;
 
 /**
-* @Description: SystemLogController类
+* @Description: SysPermController类
 * @author ymc
-* @date 2019/05/29 10:16
+* @date 2019/05/29 10:22
 */
 @RestController
-@RequestMapping("/systemLog")
-public class SystemLogController {
+@RequestMapping("/sysPerm")
+public class SysPermController {
 
     @Resource
-    private SystemLogService systemLogService;
+    private SysPermService sysPermService;
 
     @PostMapping("/insert")
-    public RetResult<Integer> insert(SystemLog systemLog) throws Exception{
-        systemLog.setId(ApplicationUtils.getUUID());
-        Integer state = systemLogService.insert(systemLog);
+    public RetResult<Integer> insert(SysPerm sysPerm) throws Exception{
+        sysPerm.setId(ApplicationUtils.getUUID());
+        Integer state = sysPermService.insert(sysPerm);
         return RetResponse.makeOKRsp(state);
     }
 
     @PostMapping("/deleteById")
     public RetResult<Integer> deleteById(@RequestParam String id) throws Exception {
-        Integer state = systemLogService.deleteById(id);
+        Integer state = sysPermService.deleteById(id);
         return RetResponse.makeOKRsp(state);
     }
 
     @PostMapping("/update")
-    public RetResult<Integer> update(SystemLog systemLog) throws Exception {
-         Integer state = systemLogService.update(systemLog);
+    public RetResult<Integer> update(SysPerm sysPerm) throws Exception {
+         Integer state = sysPermService.update(sysPerm);
          return RetResponse.makeOKRsp(state);
     }
 
     @PostMapping("/selectById")
-    public RetResult<SystemLog> selectById(@RequestParam String id) throws Exception {
-        SystemLog systemLog = systemLogService.selectById(id);
-        return RetResponse.makeOKRsp(systemLog);
+    public RetResult<SysPerm> selectById(@RequestParam String id) throws Exception {
+        SysPerm sysPerm = sysPermService.selectById(id);
+        return RetResponse.makeOKRsp(sysPerm);
     }
 
      /**
      * @Description: 分页查询
      * @param page 页码
      * @param size 每页条数
-     * @Reutrn RetResult<PageInfo<SystemLog>>
+     * @Reutrn RetResult<PageInfo<SysPerm>>
      */
      @PostMapping("/list")
-     public RetResult<PageInfo<SystemLog>> list(@RequestParam(defaultValue = "0") Integer page,
+     public RetResult<PageInfo<SysPerm>> list(@RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "0") Integer size) throws Exception {
          PageHelper.startPage(page, size);
-         List<SystemLog> list = systemLogService.selectAll();
-         PageInfo<SystemLog> pageInfo = new PageInfo<SystemLog>(list);
+         List<SysPerm> list = sysPermService.selectAll();
+         PageInfo<SysPerm> pageInfo = new PageInfo<SysPerm>(list);
          return RetResponse.makeOKRsp(pageInfo);
      }
 }

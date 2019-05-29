@@ -12,7 +12,7 @@ import javax.annotation.Resource;
 /**
 * @Description: SystemLogService接口实现类
 * @author ymc
-* @date 2019/05/28 18:02
+* @date 2019/05/29 10:16
 */
 @Service
 public class SystemLogServiceImpl extends AbstractService<SystemLog> implements SystemLogService {

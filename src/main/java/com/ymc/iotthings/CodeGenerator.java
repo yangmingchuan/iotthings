@@ -53,7 +53,7 @@ public class CodeGenerator {
      * @param args
      */
     public static void main(String[] args) {
-        genCode("system_log");
+        genCode("sys_permission_init");
     }
 
     /**
@@ -250,6 +250,11 @@ public class CodeGenerator {
         return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, tableName.toLowerCase());
     }
 
+    /**
+     * . 和 / 转换
+     * @param packageName
+     * @return
+     */
     private static String packageConvertPath(String packageName) {
         return String.format("/%s/", packageName.contains(".") ? packageName.replaceAll("\\.", "/") : packageName);
     }

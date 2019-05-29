@@ -6,7 +6,7 @@ import com.ymc.iotthings.core.universal.Service;
 /**
 * @Description: SystemLogService接口
 * @author ymc
-* @date 2019/05/28 18:02
+* @date 2019/05/29 10:16
 */
 public interface SystemLogService extends Service<SystemLog> {
 

@@ -6,6 +6,8 @@ import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter4;
 import com.ymc.iotthings.core.ret.RetCode;
 import com.ymc.iotthings.core.ret.RetResult;
+import org.apache.shiro.authz.UnauthenticatedException;
+import org.apache.shiro.authz.UnauthorizedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +20,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -62,7 +65,35 @@ public class WebConfigurer extends WebMvcConfigurationSupport {
 
     @Override
     public void configureHandlerExceptionResolvers(List<HandlerExceptionResolver> exceptionResolvers) {
-        exceptionResolvers.add(getHandlerExceptionResolver());
+        exceptionResolvers.add((request, response, handler, e) -> {
+            RetResult<Object> result = new RetResult<>();
+            // 业务失败的异常，如“账号或密码错误”
+            if (e instanceof ServiceException) {
+                result.setCode(RetCode.FAIL).setMsg(e.getMessage()).setData(null);
+                LOGGER.info(e.getMessage());
+            } else if (e instanceof NoHandlerFoundException) {
+                result.setCode(RetCode.NOT_FOUND).setMsg("接口 [" + request.getRequestURI() + "] 不存在");
+            } else if (e instanceof UnauthorizedException) {
+                result.setCode(RetCode.UNAUTHEN).setMsg("用户没有访问权限").setData(null);
+            }else if (e instanceof UnauthenticatedException) {
+                result.setCode(RetCode.UNAUTHEN).setMsg("用户未登录").setData(null);
+            }else if (e instanceof ServletException) {
+                result.setCode(RetCode.FAIL).setMsg(e.getMessage());
+            } else {
+                result.setCode(RetCode.INTERNAL_SERVER_ERROR).setMsg("接口 [" + request.getRequestURI() + "] 内部错误，请联系管理员");
+                String message;
+                if (handler instanceof HandlerMethod) {
+                    HandlerMethod handlerMethod = (HandlerMethod) handler;
+                    message = String.format("接口 [%s] 出现异常，方法：%s.%s，异常摘要：%s", request.getRequestURI(), handlerMethod.getBean().getClass().getName(), handlerMethod.getMethod()
+                            .getName(), e.getMessage());
+                } else {
+                    message = e.getMessage();
+                }
+                LOGGER.error(message, e);
+            }
+            responseResult(response, result);
+            return new ModelAndView();
+        });
     }
 
     /**
