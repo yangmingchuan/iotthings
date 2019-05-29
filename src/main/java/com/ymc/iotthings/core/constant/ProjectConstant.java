@@ -9,8 +9,11 @@ package com.ymc.iotthings.core.constant;
  **/
 
 public class ProjectConstant {
-
+    // ip地址
     public static final String IP = "58.247.251.226";
+
+    //文件上传储存的地址
+    public static final String SAVEFILEPATH = "E://1_iot_img";
 
     // 项目基础包名称
     public static final String BASE_PACKAGE = "com.ymc.iotthings";
