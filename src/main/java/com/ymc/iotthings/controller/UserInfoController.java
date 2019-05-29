@@ -2,6 +2,7 @@ package com.ymc.iotthings.controller;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.ymc.iotthings.core.aop.AnnotationLog;
 import com.ymc.iotthings.core.configurer.ServiceException;
 import com.ymc.iotthings.core.ret.RetResponse;
 import com.ymc.iotthings.core.ret.RetResult;
@@ -29,6 +30,7 @@ import java.util.List;
 * @author ymc
 * @date 2019/05/29 10:17
 */
+
 @RestController
 @RequestMapping("/userInfo")
 @Api(tags = {"用户操作接口"}, description = "RedisController")
@@ -43,6 +45,7 @@ public class UserInfoController {
             @ApiImplicitParam(name = "password", value = "密码",
                     dataType = "String", paramType = "query")
     })
+    @AnnotationLog(remark = "登录")
     @PostMapping("/login")
     public RetResult<UserInfo> login(@RequestParam String userName, @RequestParam String password) {
         Subject currentUser = SecurityUtils.getSubject();
@@ -64,6 +67,7 @@ public class UserInfoController {
             @ApiImplicitParam(name = "size", value = "每页显示条数",
                     dataType = "Integer", paramType = "query")
     })
+    @AnnotationLog(remark = "查询用户findAll")
     @PostMapping("/selectAll")
     public RetResult<PageInfo<UserInfo>> selectAll(@RequestParam(defaultValue = "0") Integer page,
                                                    @RequestParam(defaultValue = "0") Integer size) {
@@ -104,6 +108,7 @@ public class UserInfoController {
      * @param size 每页条数
      * @Reutrn RetResult<PageInfo<UserInfo>>
      */
+     @AnnotationLog(remark = "查询所有用户list")
      @PostMapping("/list")
      public RetResult<PageInfo<UserInfo>> list(@RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "0") Integer size) throws Exception {

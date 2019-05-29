@@ -3,6 +3,7 @@ package com.ymc.iotthings.model;
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.util.Date;
 
 @Table(name = "system_log")
@@ -57,6 +58,18 @@ public class SystemLog {
 
     @Column(name = "create_time")
     private Date createTime;
+
+    /**
+     * 日志类型为正常
+     */
+    @Transient
+    public static final String LOGINFO = "0";
+
+    /**
+     * 日志类型为异常
+     */
+    @Transient
+    public static final String LOGERROR = "1";
 
     /**
      * @return id

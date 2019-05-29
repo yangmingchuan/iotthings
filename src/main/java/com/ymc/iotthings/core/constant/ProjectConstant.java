@@ -10,6 +10,8 @@ package com.ymc.iotthings.core.constant;
 
 public class ProjectConstant {
 
+    public static final String IP = "58.247.251.226";
+
     // 项目基础包名称
     public static final String BASE_PACKAGE = "com.ymc.iotthings";
 

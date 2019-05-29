@@ -4,6 +4,7 @@ import javax.persistence.*;
 
 @Table(name = "sys_permission_init")
 public class SysPermissionInit {
+    @Id
     private String id;
 
     /**
