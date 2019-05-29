@@ -12,6 +12,7 @@ import javax.sql.DataSource;
 
 /**
  *  mybatis 配置
+ *
  *  @Configuration表示该文件是一个配置文件
  *  @Bean表示该方法是一个传统xml配置文件中的<Bean id=""></Bean>
  * 参考博客：https://juejin.im/post/5ad6b3c3f265da237c696ba0
