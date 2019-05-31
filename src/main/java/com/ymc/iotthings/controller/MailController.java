@@ -55,5 +55,4 @@ public class MailController {
         return RetResponse.makeOKRsp();
     }
 
-
 }

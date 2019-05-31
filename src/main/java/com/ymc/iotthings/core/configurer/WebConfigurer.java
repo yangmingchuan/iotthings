@@ -17,8 +17,10 @@ import org.springframework.messaging.handler.HandlerMethod;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
+import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -40,6 +42,32 @@ import java.util.List;
 public class WebConfigurer extends WebMvcConfigurationSupport {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WebConfigurer.class);
+    private static final String IZATION = "YMC";
+
+    /**
+     * 添加拦截器 请求头拦截
+     * @param registry
+     */
+    @Override
+    protected void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new HandlerInterceptorAdapter() {
+                    @Override
+                    public boolean preHandle(HttpServletRequest request,
+                                             HttpServletResponse response, Object handler) throws Exception {
+                        String ization = request.getHeader("key");
+                        if(IZATION.equals(ization)){
+                            return true;
+                        }else{
+                            RetResult<Object> result = new RetResult<>();
+                            result.setCode(RetCode.UNAUTHORIZED).setMsg("签名认证失败");
+                            responseResult(response, result);
+                            return false;
+                        }
+                    }
+                }
+                //这里添加的是拦截的路径  /**为全部拦截
+        ).addPathPatterns("/userInfo/login");
+    }
 
     /**
      * 修改自定义消息转换器
