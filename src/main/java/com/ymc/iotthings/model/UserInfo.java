@@ -40,7 +40,6 @@ public class UserInfo {
     @Transient
     private Set<String> perms;
 
-
     /**
      * @return id
      */

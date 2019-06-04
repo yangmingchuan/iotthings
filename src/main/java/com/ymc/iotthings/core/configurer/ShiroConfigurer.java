@@ -1,9 +1,11 @@
 package com.ymc.iotthings.core.configurer;
 
 import com.ymc.iotthings.core.shiro.CustomRealm;
+import com.ymc.iotthings.core.shiro.MySessionManager;
 import com.ymc.iotthings.model.SysPermissionInit;
 import com.ymc.iotthings.service.SysPermissionInitService;
 import org.apache.shiro.realm.Realm;
+import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.spring.web.config.DefaultShiroFilterChainDefinition;
 import org.apache.shiro.spring.web.config.ShiroFilterChainDefinition;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
@@ -33,6 +35,15 @@ public class ShiroConfigurer {
     @Bean
     public Realm realm() {
         return new CustomRealm();
+    }
+
+    /**
+     * session 配置
+     * @return SessionManager
+     */
+    @Bean
+    public SessionManager sessionManager(){
+        return new MySessionManager();
     }
 
     @Bean

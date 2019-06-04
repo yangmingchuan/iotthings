@@ -49,7 +49,10 @@ public class UserInfoController {
     @PostMapping("/login")
     public RetResult<UserInfo> login(@RequestParam String userName, @RequestParam String password) {
         Subject currentUser = SecurityUtils.getSubject();
-        //登录
+        currentUser.login(new UsernamePasswordToken(userName, password));
+        //从session取出用户信息 currentUser.getSession().getId()
+        //UserInfo user = (UserInfo) currentUser.getPrincipal();
+        //登录  获取session currentUser.getSession().getId()
         try {
             currentUser.login(new UsernamePasswordToken(userName, password));
         }catch (IncorrectCredentialsException i){
