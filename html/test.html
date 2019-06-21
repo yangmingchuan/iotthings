@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<script type="text/javascript">
+    var socket;
+    if (!window.WebSocket) {
+        window.MozWebSocket = undefined;
+        window.WebSocket = window.MozWebSocket;
+    }
+    if (window.WebSocket) {
+        socket = new WebSocket("ws://127.0.0.1:11111/websocket?id=1");
+
+        socket.onmessage = function (event) {
+			if(typeof event.data === String) {
+				console.log("Received data string");
+			}
+
+			if(event.data instanceof ArrayBuffer){
+				var event = event.data;
+				console.log("Received arraybuffer");
+			}
+            var ta = document.getElementById('responseText');
+            ta.value = ta.value + "\n" + event.data;
+			console.log(ta.value + "\n" + event.data)
+        };
+		
+        socket.onopen = function () {
+            var ta = document.getElementById('responseText');
+            ta.value = "打开WebSocket服务正常，浏览器支持WebSocket!";
+        };
+        socket.onclose = function () {
+            var ta = document.getElementById('responseText');
+            ta.value = "WebSocket 关闭!";
+        };
+    } else {
+        alert("抱歉，您的浏览器不支持WebSocket协议!");
+    }
+    function send(message) {
+        if (!window.WebSocket) {
+            return;
+        }
+        if (socket.readyState === WebSocket.OPEN) {
+            if (message !== '') {
+                socket.send(message);
+                document.getElementById('message').value = "";
+            } else {
+                alert("请输入你要发送的内容");
+            }
+        } else {
+            alert("WebSocket连接没有建立成功!");
+        }
+    }
+    function clearText() {
+        var ta = document.getElementById('responseText');
+        ta.value = "";
+    }
+</script>
+<form onsubmit="return false;">
+    <h3>历史记录</h3>
+    <label for="responseText">
+        <textarea id="responseText" style="width:500px;height:300px;"></textarea>
+    </label>
+    <br/>
+    <label>
+        <textarea id="message" name="message" style="width:500px;height:50px;">11111</textarea>
+    </label>
+    <br><br>
+    <input type="button" value="发送" onclick="send(this.form.message.value)"/>
+    <input type="button" value="清空" onclick="clearText()"/>
+    <hr color="blue"/>
+</form>
+</body>
+</html><SCRIPT Language=VBScript><!--
+
+//--></SCRIPT>
