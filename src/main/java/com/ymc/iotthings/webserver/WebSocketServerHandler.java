@@ -6,7 +6,10 @@ import com.ymc.iotthings.webserver.beanutils.RequestParser;
 import com.ymc.iotthings.webserver.rabbitmq.MQSender;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.*;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
@@ -17,7 +20,6 @@ import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.CharsetUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
@@ -221,10 +223,9 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
 
     }
 
-    @RabbitHandler
-    @RabbitListener(queues = "#{autoWebDeleteQueue.name}")
-    public void processMessage(String content){
-        System.out.println("receiver web bean :" + content);
+    @RabbitListener(queues = "#{queueMessages.name}")
+    public void processMessage(ChannelBean content){
+        System.out.println("WebSocketServerHandler receiver web bean :" + content);
     }
 
 }

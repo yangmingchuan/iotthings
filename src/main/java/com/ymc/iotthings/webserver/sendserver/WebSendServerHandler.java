@@ -18,6 +18,7 @@ import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.CharsetUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
@@ -169,14 +170,14 @@ public class WebSendServerHandler extends SimpleChannelInboundHandler<Object> {
         }
     }
 
-//    @RabbitHandler
-    @RabbitListener(queues = "#{autoDeleteQueue.name}")
-    public void processMessage(ChannelBean content){
+    @RabbitHandler
+    @RabbitListener(queues = "#{queueMessage.name}")
+    public void processMessage1(ChannelBean content){
         /**
          * client server 通知 web server
          */
         System.out.println("web netty 接收到消息 :" + content.getLineId());
         msg = String.format("%s  %s", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), "web send");
-        mqSender.webSend("exchange.100",msg);
+        mqSender.webSend(content);
     }
 }

@@ -21,15 +21,15 @@ public class MQSender {
     private static final Logger LOGGER = LoggerFactory.getLogger(MQSender.class);
     private final AmqpAdmin amqpAdmin;
     private final RabbitTemplate rabbitTemplate;
-    private final FanoutExchange fanoutExchange;
+//    private final FanoutExchange fanoutExchange;
     private final RabbitmqConfig rabbitmqConfig;
 
     @Autowired
-    public MQSender(AmqpAdmin amqpAdmin, RabbitTemplate rabbitTemplate, FanoutExchange fanoutExchange,RabbitmqConfig rabbitmqConfig) {
+    public MQSender(AmqpAdmin amqpAdmin, RabbitTemplate rabbitTemplate, RabbitmqConfig rabbitmqConfig) {
         LOGGER.info("MQSender 初始化中...");
         this.amqpAdmin = amqpAdmin;
         this.rabbitTemplate = rabbitTemplate;
-        this.fanoutExchange = fanoutExchange;
+//        this.fanoutExchange = fanoutExchange;
         this.rabbitmqConfig = rabbitmqConfig;
     }
 
@@ -39,41 +39,40 @@ public class MQSender {
      * @param msg msg
      */
     public <T> void send(String exchangeName,T msg){
-        FanoutExchange exchange = new FanoutExchange(exchangeName);
-        amqpAdmin.declareExchange(exchange);
-        Queue queue = rabbitmqConfig.autoDeleteQueue();
+//        FanoutExchange exchange = new FanoutExchange(exchangeName);
+//        amqpAdmin.declareExchange(exchange);
+        Queue queue = rabbitmqConfig.queueMessage();
         amqpAdmin.declareQueue(queue);
-        Binding binding = BindingBuilder.bind(queue).to(fanoutExchange);
-        amqpAdmin.declareBinding(binding);
+//        Binding binding = BindingBuilder.bind(queue).to(fanoutExchange);
+//        amqpAdmin.declareBinding(binding);
         if(msg instanceof String){
             MessageProperties messageProperties = new MessageProperties();
             //设置消息内容的类型，默认是 application/octet-stream 会是 ASCII 码值
             messageProperties.setContentType(MessageProperties.CONTENT_TYPE_TEXT_PLAIN);
             Message message = new Message(((String) msg).getBytes(),messageProperties);
-            rabbitTemplate.convertAndSend(fanoutExchange.getName(),queue.getName(),message);
+            rabbitTemplate.convertAndSend("exchange",queue.getName(),message);
         }else if(msg instanceof ChannelBean){
-            rabbitTemplate.convertAndSend(fanoutExchange.getName(),queue.getName(), msg);
+            rabbitTemplate.convertAndSend("exchange",queue.getName(), msg);
         }
     }
 
     /**
      * 给queue发送消息
-     * @param queueName queueName
      * @param msg msg
      */
-    public <T> void webSend(String queueName,T msg){
-        Queue queue = rabbitmqConfig.autoWebDeleteQueue();
+    public <T> void webSend(T msg){
+        Queue queue = rabbitmqConfig.queueMessages();
         amqpAdmin.declareQueue(queue);
-        Binding binding = BindingBuilder.bind(queue).to(fanoutExchange);
-        amqpAdmin.declareBinding(binding);
+//        Binding binding = BindingBuilder.bind(queue).to(fanoutExchange);
+//        amqpAdmin.declareBinding(binding);
         if(msg instanceof String){
             MessageProperties messageProperties = new MessageProperties();
             //设置消息内容的类型，默认是 application/octet-stream 会是 ASCII 码值
             messageProperties.setContentType(MessageProperties.CONTENT_TYPE_TEXT_PLAIN);
             Message message = new Message(((String) msg).getBytes(),messageProperties);
-            rabbitTemplate.convertAndSend("fanout-web-exchange",queueName,message);
+            rabbitTemplate.convertAndSend("exchange",queue.getName(),message);
         }else if(msg instanceof ChannelBean){
-            rabbitTemplate.convertAndSend("fanout-web-exchange",queueName, msg);
+            rabbitTemplate.convertAndSend("exchange",queue.getName(), msg);
         }
     }
 

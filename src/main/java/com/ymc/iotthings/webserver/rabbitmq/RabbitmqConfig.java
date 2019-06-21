@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * rabbitmq 配置
- *
+ * <p>
  * package name: com.ymc.iotthings.webserver.rabbitmq.customize
  * date :2019/5/14
  * author : ymc
@@ -15,50 +15,32 @@ import org.springframework.stereotype.Component;
 @Component
 public class RabbitmqConfig {
 
-    /**
-     * @apiNote 定义扇出（广播）交换器
-     */
-    @Bean
-    public FanoutExchange fanoutExchange() {
-        return new FanoutExchange("fanout-exchange");
-    }
+    private final static String message = "web.socket.message";
+    private final static String messages = "send.socket.message";
 
-    /**
-     * @apiNote 定义扇出（广播）交换器
-     */
     @Bean
-    public FanoutExchange fanoutWebExchange() {
-        return new FanoutExchange("fanout-web-exchange");
-    }
-
-
-    /**
-     * @apiNote 定义自动删除匿名队列
-     */
-    @Bean
-    public Queue autoDeleteQueue() {
-        return new AnonymousQueue();
+    public Queue queueMessage() {
+        return new Queue(RabbitmqConfig.message);
     }
 
     @Bean
-    public Queue autoWebDeleteQueue() {
-        return new AnonymousQueue();
-    }
-
-    /**
-     * @param fanoutExchange 扇出（广播）交换器
-     * @param autoDeleteQueue 自动删除队列
-     * @apiNote 把队列绑定到扇出（广播）交换器
-     * @return Binding
-     */
-    @Bean
-    public Binding binding(FanoutExchange fanoutExchange, Queue autoDeleteQueue) {
-        return BindingBuilder.bind(autoDeleteQueue).to(fanoutExchange);
+    public Queue queueMessages() {
+        return new Queue(RabbitmqConfig.messages);
     }
 
     @Bean
-    public Binding webBinding(FanoutExchange fanoutWebExchange, Queue autoWebDeleteQueue) {
-        return BindingBuilder.bind(autoWebDeleteQueue).to(fanoutWebExchange);
+    TopicExchange exchange() {
+        return new TopicExchange("exchange");
+    }
+
+    @Bean
+    Binding bindingExchangeMessage(Queue queueMessage, TopicExchange exchange) {
+        return BindingBuilder.bind(queueMessage).to(exchange).with("web.#");
+    }
+
+    @Bean
+    Binding bindingExchangeMessages(Queue queueMessages, TopicExchange exchange) {
+        return BindingBuilder.bind(queueMessages).to(exchange).with("send.#");
     }
 
 }
