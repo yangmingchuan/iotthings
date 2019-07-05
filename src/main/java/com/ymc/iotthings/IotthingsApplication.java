@@ -32,13 +32,13 @@ public class IotthingsApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		fixedThreadPool.execute(() -> {
-            try {
-                webSendServer.run(Init.SEND_PORT);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
+//		fixedThreadPool.execute(() -> {
+//            try {
+//                webSendServer.run(Init.SEND_PORT);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        });
 		fixedThreadPool.execute(() -> {
 			try {
 				webSocketServer.run(Init.PORT);

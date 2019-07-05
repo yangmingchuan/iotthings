@@ -107,6 +107,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
         heartCounter = 0;
+        LOG.error("-- channelRead0 --"+msg.toString() );
         // 传统的HTTP接入
         if (msg instanceof FullHttpRequest) {
             handleHttpRequest(ctx, (FullHttpRequest) msg);
@@ -117,9 +118,15 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
         }
     }
 
+    /**
+     * 设备连接
+     * @param ctx
+     * @throws Exception
+     */
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         super.channelActive(ctx);
+        LOG.error("-- channelActive --"+ctx.toString() );
     }
 
     /**
