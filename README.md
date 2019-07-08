@@ -2,6 +2,8 @@
 
 iotthing 是目前自己学习的 物联网的 Demo
 
+> 参考项目 https://github.com/daoshenzzg/socket-mqtt
+
 # 主要技术
 spring boot + netty + mqtt + rabbitmq + my baits + shiro + aop + fileupload + mail
 
