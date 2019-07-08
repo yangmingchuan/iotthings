@@ -5,6 +5,7 @@ import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 
 /**
@@ -13,11 +14,12 @@ import org.slf4j.LoggerFactory;
  * @author daoshenzzg@163.com
  * @date 2018/12/30 18:40
  */
+@Component
 public class MqttClientTest1 {
     private static final Logger logger = LoggerFactory.getLogger(MqttServerTest.class);
     private static boolean hasfirs = false;
 
-    public static void main(String[] args) {
+    public void run() throws Exception {
         final String broker = "tcp://127.0.0.1:1883";
         final String clientId = "GID_11";
         final String[] topic = {"PRODUCT/P/#"};
@@ -72,11 +74,12 @@ public class MqttClientTest1 {
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
-                Thread.sleep(5000L);
+                Thread.sleep(20000L);
             }
         } catch (Exception me) {
             me.printStackTrace();
         }
     }
+
 
 }

@@ -1,5 +1,7 @@
 package com.ymc.iotthings;
 
+import com.ymc.iotthings.mqtt.MqttClientTest1;
+import com.ymc.iotthings.mqtt.MqttServerTest;
 import com.ymc.iotthings.webserver.WebSocketServer;
 import com.ymc.iotthings.webserver.beanutils.Init;
 import com.ymc.iotthings.webserver.sendserver.WebSendServer;
@@ -21,6 +23,13 @@ public class IotthingsApplication implements CommandLineRunner {
 	WebSocketServer webSocketServer;
 	@Resource
 	WebSendServer webSendServer;
+
+	@Autowired
+	MqttServerTest mqttServerTest;
+
+	@Autowired
+	MqttClientTest1 mqttClientTest1;
+
 	/**
 	 * 定长 线程池
 	 */
@@ -46,5 +55,7 @@ public class IotthingsApplication implements CommandLineRunner {
 				e.printStackTrace();
 			}
 		});
+		mqttServerTest.run();
+		mqttClientTest1.run();
 	}
 }

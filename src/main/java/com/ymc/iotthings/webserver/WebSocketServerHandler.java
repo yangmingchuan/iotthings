@@ -48,7 +48,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
      * 线程安全 linkedList
      */
     private static ConcurrentLinkedQueue<ChannelBean> beanList = new ConcurrentLinkedQueue<>();
-
+    private static ConcurrentLinkedQueue<ChannelHandlerContext> ctList = new ConcurrentLinkedQueue<>();
     private WebSocketServerHandshaker handshaker;
     private MQSender mqSender;
     protected String name;
@@ -126,6 +126,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         super.channelActive(ctx);
+        ctList.add(ctx);
         LOG.error("-- channelActive --"+ctx.toString() );
     }
 
@@ -137,6 +138,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
         beanList.removeIf(channelBean -> channelBean.getChannelId().equals(ctx.channel().id()));
+        ctList.remove(ctx);
         LOG.error("-- remove --" + beanList.toString());
     }
 
@@ -199,7 +201,6 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
         }
     }
 
-
     private void handleWebSocketFrame(ChannelHandlerContext ctx, WebSocketFrame frame) {
         // 判断是否是关闭链路的指令
         if (frame instanceof CloseWebSocketFrame) {
@@ -221,18 +222,27 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
         String msg = String.format("%s  %s", LocalDateTime.now().
                 format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), request);
 
-        for (ChannelBean bean : beanList) {
-            if (bean.isActive() && bean.getChannelId().equals(ctx.channel().id())) {
-                ctx.writeAndFlush(new TextWebSocketFrame("发送到 客户端 -" + bean.getLineId() + "- :" + msg));
-                mqSender.send("exchange."+bean.getLineId(),bean);
-            }
-        }
+//        for (ChannelBean bean : beanList) {
+//            if (bean.isActive() && bean.getChannelId().equals(ctx.channel().id())) {
+//                ctx.writeAndFlush(new TextWebSocketFrame("发送到 客户端 -" + bean.getLineId() + "- :" + msg));
+//                mqSender.send("exchange."+bean.getLineId(),bean);
+//            }
+//        }
 
     }
 
     @RabbitListener(queues = "#{queueMessages.name}")
-    public void processMessage(ChannelBean content){
+    public void processMessage(String content){
         System.out.println("WebSocketServerHandler receiver web bean :" + content);
+
+        //TODO 2019年7月5日 17:20:42
+        for(ChannelHandlerContext ctBean : ctList){
+            if(ctBean.isRemoved()){
+                continue;
+            }
+            ctBean.writeAndFlush(new TextWebSocketFrame("设备信息 -" + content));
+        }
+
     }
 
 }

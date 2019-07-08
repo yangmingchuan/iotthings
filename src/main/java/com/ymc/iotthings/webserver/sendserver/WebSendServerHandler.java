@@ -178,6 +178,6 @@ public class WebSendServerHandler extends SimpleChannelInboundHandler<Object> {
          */
         System.out.println("web netty 接收到消息 :" + content.getLineId());
         msg = String.format("%s  %s", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), "web send");
-        mqSender.webSend(content);
+//        mqSender.webSend(content);
     }
 }
