@@ -1,0 +1,21 @@
+# iotthings
+
+iotthing 是目前自己学习的 物联网的 Demo
+
+# 主要技术
+spring boot + netty + mqtt + rabbitmq + my baits + shiro + aop + fileupload + mail
+
+
+# 部分相关文章
+
+1. https://www.jianshu.com/p/c7a6f0f2a70b    Spring Boot 入门搭建
+
+2. https://www.jianshu.com/p/0a0461e83bb4    netty 的引入 和 心跳添加
+
+3. https://www.jianshu.com/p/738adca307aa    Rabbitmq 的 接入 及使用
+
+4. https://www.jianshu.com/p/179317faf4dd  部分好资源的分享
+
+
+
+
