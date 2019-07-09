@@ -7,6 +7,8 @@ iotthing 是目前自己学习的 物联网的 Demo
 
 > netty 学习文章  https://zhuanlan.zhihu.com/p/48591893
 
+> netty 相关书籍  链接：https://pan.baidu.com/s/1cXHq90EW_l9NwQT_1js8Fw 提取码：nwa1 
+
 # 主要技术
 spring boot + netty + mqtt + rabbitmq + my baits + shiro + aop + fileupload + mail
 
